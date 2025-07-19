@@ -9,9 +9,7 @@ import os
 from colormath.color_objects import sRGBColor, LabColor
 from colormath.color_conversions import convert_color
 from colormath.color_diff import delta_e_cie2000
-from PIL import Image
 
-# ========================== 定义语义颜色 ==========================
 semantic_colors = {
     "building": (84, 155, 255),
     "parking": (255, 229, 145),
@@ -38,12 +36,11 @@ semantic_lab_values = [
     for rgb in semantic_colors.values()
 ]
 
-# ========================== BEV 和 RGB ==========================
 
 demo = Demo(num_rotations=256)
 
-base_filename = "1"
-input_dir = "assets"
+base_filename = "1-1"
+input_dir = "scenes"
 output_dir = "bev"
 os.makedirs(output_dir, exist_ok=True)
 
@@ -68,13 +65,12 @@ conf_q = conf_q.squeeze(0).cpu().numpy()
 
 valid_mask = (mask_bev != 0) & ~np.all(feats_q_rgb == [255, 255, 255], axis=-1)
 valid_pixels = feats_q_rgb[valid_mask]
-
 valid_pixels_lab = [
     convert_color(sRGBColor(*rgb, is_upscaled=True), LabColor)
     for rgb in valid_pixels
 ]
 
-# 使用 CIE2000 色差计算最近的语义颜色
+# Color difference calculation
 mapped_colors = []
 for pixel_lab in valid_pixels_lab:
     min_delta_e = float('inf')
@@ -94,6 +90,7 @@ mapped_image_rgba = np.zeros((mapped_image.shape[0], mapped_image.shape[1], 4), 
 mapped_image_rgba[..., :3] = mapped_image
 mapped_image_rgba[..., 3] = 255
 mapped_image_rgba[~valid_mask, 3] = 0
+
 cv2.imwrite(output_image_path, mapped_image_rgba)
 print(f"Mapped image saved to: {output_image_path}")
 
@@ -107,4 +104,5 @@ data = {
 df = pd.DataFrame(data)
 df.to_excel(output_excel_path, index=False)
 print(f"Excel file saved to: {output_excel_path}")
+
 
