@@ -4,7 +4,7 @@ from maploc.demo import Demo
 from maploc.utils.viz_2d import plot_images
 
 demo = Demo(num_rotations=256, device='cpu')
-image_path = "assets/7-1.jpg"
+image_path = "scenes/1-1.jpg"
 
 image, camera, gravity = demo.read_input_image(image_path,)
 
@@ -23,5 +23,5 @@ plot_images(
     cmaps="jet",
 )
 
-# plt.savefig('bev/1.jpg', bbox_inches='tight', pad_inches=0)
+# plt.savefig('bev/1-1neturalBEV.jpg', bbox_inches='tight', pad_inches=0)
 plt.show()
